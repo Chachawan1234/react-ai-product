@@ -15,3 +15,4 @@ export interface BaseConfig {
     hooks?: BaseHooks;
     fetch?:FetchConfig;
 }
+// 测试
