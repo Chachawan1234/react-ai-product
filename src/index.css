@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@plugin "daisyui";
+:root {
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* --my-color:#f90; */
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+@theme{
+  /* --spacing:20px; */
+  /* --text-base:16px; */
+  /* --main-color:#f90; */
+  /* --color-main-color:oklch(91%,0.096 180.426); */
+  /* --color-main:oklch(54.2% 0.034 322.5); */
+}
+@theme inline{
+  /* --color-my-1:var(--my-color); */
+}
+/* *{
+  margin:0;
+  padding:0;
+} */
