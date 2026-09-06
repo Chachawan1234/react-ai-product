@@ -49,28 +49,56 @@ export abstract class BaseEngine<T extends BaseConfig = BaseConfig> {
     // @params isRoot 是否为根配置
     public static mergeConfig<T extends BaseConfig>(        
         base:T,
-        local: Partical<T> = {},
+        local: Partial<T> = {},
         isRoot:boolean = true
 
     ):T{
         // 浅拷贝
-        const result={...base};
+        const result={...base} as any;
         for(const key in local){
             const val=local[key];
         // 处理hooks
         if(isRoot && key === 'hooks' && typeof val === 'object'){
             // 确保hooks不是被覆盖而是合并为一个队列
-            result.hooks = this.mergeHooks(base.hooks || {}, val || {})
+            result.hooks = this.#mergeHooks(base.hooks || {}, val || {})
         }
-        // 出路baseURl
+        // 处理baseUrl
+        else if(isRoot && key === 'baseUrl' && typeof val==="string"){
+            result.baseUrl = this.#mergeUrl(base.baseUrl,val)
+        }
         //处理嵌套对象，eg.fetch,sse,ws
+        else if(isRoot && val && ["fetch","sse","ws"].includes(key)&& typeof val === 'object'){
+            const baseForEngine = {
+                ...(base[key] || {}),
+                hooks: this.#mergeHooks(
+                    base.hooks || {},
+                    (base[key] as any)?.hooks || {}),
+                baseUrl:(base[key] as any)?.baseUrl||base.baseUrl
+            };
+            result[key] = this.mergeConfig(baseForEngine,val);
+        }
         // 处理普通嵌套对象 ,eg.请求头header
+        else if(isRoot && typeof val === 'object' &&
+            !Array.isArray(val) && 
+            !(val instanceof AbortSignal) && 
+            !(val instanceof FormData)
+            //保护abortSignal和formdata不被合并
+        ){
+            result[key] = this.mergeConfig(
+                base[key] as BaseConfig,
+                val,
+                false,
+            );
+        }
         // 处理其他字段
+        else{
+            result[key] = val;
+        }
         }
         return result;
     }
 
-    static mergeHooks(targetHooks:any,sourceHooks:any){
+    static #mergeHooks(targetHooks:any,sourceHooks:any){
         // 目标浅拷贝
         const merged = {...targetHooks};
 
@@ -93,5 +121,22 @@ export abstract class BaseEngine<T extends BaseConfig = BaseConfig> {
             merged[key]=[...new Set(combined)];
         })
         return merged;
+    }
+    static #mergeUrl(baseUrl:string = '',localUrl:string=''):string{
+        // base空则返回local，local为空同理
+        if(!baseUrl) return localUrl;
+        if(!localUrl) return baseUrl;
+
+        // localUrl绝对路径，返回localUrl
+        if(localUrl.startsWith('http://')|| localUrl.startsWith('https://')) {
+            return localUrl;}
+
+        // url拼接
+        try{
+            return new URL(localUrl,baseUrl).href;
+        }
+        catch{
+            return baseUrl + localUrl;
+        }
     }
 } 

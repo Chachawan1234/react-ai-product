@@ -11,7 +11,7 @@ export interface BaseHooks {
 
 }
 export interface BaseConfig {
-    baseURL: string;//基础URL
+    baseUrl: string;//基础URL
     timeout?: number;//超时时间
     hooks?: BaseHooks;
     fetch?: FetchConfig;
