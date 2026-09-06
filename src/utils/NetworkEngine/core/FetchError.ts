@@ -1,10 +1,11 @@
-import { ApiError } from './apiError.ts'
-export default class FetchError extends ApiError{
+import type { FetchConfig } from '../types/fetch.ts';
+import { ApiError } from './ApiError.ts';
+export default class FetchError extends ApiError<FetchConfig>{
     constructor(message:string,
             status?:number,
             response?:Response,
             data?:any,
-            config?:any,
+            config?:FetchConfig,
             )
     {
         super(message,

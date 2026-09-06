@@ -7,7 +7,7 @@ export class ApiError<T extends BaseConfig =BaseConfig> extends Error{
     response?:Response;//http响应对象
     data?: any;//api返回数据
     config?:T;//请求配置
-    constructor(
+    constructor(    //构造函数
         message:string,
         status?:number,
         response?:Response,
